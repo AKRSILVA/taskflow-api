@@ -1,0 +1,56 @@
+## .NET / Visual Studio / Rider / VS Code
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+# Rider / ReSharper / VS
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+.nuget/
+
+# Banco de dados local (SQLite - dev)
+*.db
+*.db-shm
+*.db-wal
+
+# User secrets / credenciais nunca devem ir para o repositório
+*.pfx
+*.publishsettings
+appsettings.*.local.json
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Azure / publish
+PublishProfiles/
+*.PublishSettings
