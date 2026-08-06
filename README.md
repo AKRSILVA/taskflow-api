@@ -9,7 +9,8 @@ API RESTful para gestão de projetos e tarefas, construída em **ASP.NET Core 10
 - **JWT Bearer Authentication** (`Microsoft.AspNetCore.Authentication.JwtBearer`)
 - **Swagger / OpenAPI** (Swashbuckle) com suporte a autenticação Bearer
 - **xUnit** + `Microsoft.AspNetCore.Mvc.Testing` para testes de integração ponta a ponta
-- **CI/CD**: GitHub Actions → Azure App Service *(em construção — ver [Roadmap](#roadmap))*
+- **Docker** + **Azure Container Apps** (serverless, escala a zero) para produção
+- **CI/CD**: GitHub Actions — build + testes em todo push/PR, deploy automático na `main` (build da imagem, push para o GitHub Container Registry, `az containerapp update`), autenticado via OIDC (sem senha/secret de longa duração)
 
 ## Arquitetura
 
@@ -82,15 +83,24 @@ dotnet test
 
 Os testes de integração sobem a API inteira em memória (`WebApplicationFactory`), cada classe de teste com seu próprio banco SQLite temporário e chave JWT isolada — sem tocar no ambiente de desenvolvimento.
 
+## Deploy
+
+A imagem Docker (`Dockerfile` na raiz) roda a API sem nenhuma alteração de código. Em produção:
+
+- **Azure Container Apps** (plano Consumption) — serverless, escala a zero quando ocioso
+- **Azure SQL Database** (tier gratuito, serverless, auto-pausa) como banco de produção
+- Imagem publicada no **GitHub Container Registry** (`ghcr.io`) a cada push na `main`
+- Autenticação do GitHub Actions no Azure via **OIDC/federated credentials** — nenhuma senha ou client secret de longa duração é armazenada como secret do repositório
+
 ## Roadmap
 
 - [x] Modelagem de domínio (User, Project, TaskItem) + EF Core + migrations
 - [x] Autenticação JWT (registro/login)
 - [x] CRUD de Projects e Tasks com isolamento por usuário
 - [x] Testes de integração (Auth, Projects, Tasks) e unitários (TokenService)
-- [ ] Pipeline CI/CD (GitHub Actions): build + testes a cada push/PR
-- [ ] Deploy contínuo para Azure App Service
-- [ ] Banco de produção (Azure SQL) via connection string em App Settings
+- [x] Pipeline CI/CD (GitHub Actions): build + testes a cada push/PR
+- [x] Deploy contínuo para Azure Container Apps
+- [x] Banco de produção (Azure SQL Database) via secret no Container App
 
 ## Licença
 

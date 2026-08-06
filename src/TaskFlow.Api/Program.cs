@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -99,6 +100,18 @@ app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskFlow API v1");
+});
+
+// Atrás do ingress do Azure Container Apps (ou qualquer reverse proxy), o TLS é
+// terminado na borda e a requisição chega ao container em HTTP puro. Sem isso,
+// UseHttpsRedirection() abaixo entraria em loop de redirecionamento. KnownNetworks/
+// KnownProxies são limpos porque o proxy da plataforma não tem IP fixo conhecido —
+// o container só é alcançável através dele mesmo, então o header é confiável.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    KnownIPNetworks = { },
+    KnownProxies = { }
 });
 
 app.UseHttpsRedirection();
