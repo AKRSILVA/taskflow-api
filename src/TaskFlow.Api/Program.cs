@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using TaskFlow.Api.Services;
@@ -22,7 +23,13 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+    builder.Services.AddDbContext<AppDbContext>(options => options
+        .UseSqlServer(connectionString)
+        // A migration InitialCreate foi gerada com o provider SQLite ativo em design-time.
+        // Rodando contra SQL Server, o EF compara metadados específicos de provider (não o
+        // modelo C# em si, que não mudou) e aponta uma divergência falsa. Suprimido conforme
+        // recomendado pela própria mensagem do EF Core: https://aka.ms/efcore-docs-pending-changes
+        .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
 }
 
 // Autenticação JWT.
