@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -99,7 +100,19 @@ using (var scope = app.Services.CreateScope())
         // Data/Migrations são mantidas só para o provider de produção (SQL Server) —
         // uma migration gerada sob um provider carrega tipos de coluna específicos
         // dele (ex.: TEXT/INTEGER do SQLite), incompatíveis com outro provider.
-        db.Database.EnsureCreated();
+        //
+        // EnsureCreated() não é documentadamente seguro contra chamadas concorrentes
+        // no mesmo arquivo (microsoft.com/ef/core: "not safe against concurrent calls").
+        // Em CI, testes de integração de classes diferentes rodam em paralelo; se dois
+        // hosts inicializarem quase ao mesmo tempo, um pode perder a corrida e receber
+        // "table already exists" mesmo com o schema corretamente criado pelo outro.
+        try
+        {
+            db.Database.EnsureCreated();
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 1)
+        {
+        }
     }
     else
     {
