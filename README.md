@@ -2,6 +2,9 @@
 
 API RESTful para gestão de projetos e tarefas, construída em **ASP.NET Core 10** com autenticação **JWT**, **Entity Framework Core** e arquitetura em camadas. Projeto de portfólio focado em boas práticas de API design, segurança e testes automatizados.
 
+🔗 **API em produção**: https://taskflow-api.purplepond-07af5bee.brazilsouth.azurecontainerapps.io/swagger
+*(hospedada em plano Consumption gratuito — pode levar alguns segundos para "acordar" após período ocioso)*
+
 ## Stack
 
 - **.NET 10 / ASP.NET Core Web API**
